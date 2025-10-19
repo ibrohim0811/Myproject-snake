@@ -1,0 +1,36 @@
+name: Generate Snake
+
+on:
+  schedule:
+    - cron: "0 */12 * * *" # Har 12 soatda ishga tushadi
+  workflow_dispatch:        # Qo'lda ham ishga tushirish mumkin
+
+permissions:
+  contents: write          # Repo ichidagi fayllarni o'zgartirish uchun
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Repo'ni checkout qilamiz
+      - uses: actions/checkout@v4
+
+      # Snake SVG faylini generatsiya qilish
+      - uses: Platane/snk@v3
+        id: snake-gif
+        with:
+          github_user_name: ibrohim0811   # <-- GitHub username'ing
+          outputs: |
+            dist/github-contribution-grid-snake.svg
+            dist/github-contribution-grid-snake-dark.svg
+
+      # Contribution graph uchun commit qilish
+      - name: Commit snake changes
+        run: |
+          echo "Snake commit $(date)" >> snake.txt
+          git config --global user.email "216202826+ibrohim0811@users.noreply.github.com"
+          git config --global user.name "ibrohim0811"
+          git add snake.txt dist/github-contribution-grid-snake.svg dist/github-contribution-grid-snake-dark.svg
+          git commit -m "Snake commit $(date)" || echo "No changes to commit"
+          git push
